@@ -23,18 +23,39 @@ def mark_attendance(attendance: AttendanceCreate, db: Session = Depends(get_db))
         )
     
     try:
-        db_attendance = Attendance(**attendance.model_dump())
-        db.add(db_attendance)
-        db.commit()
-        db.refresh(db_attendance)
+        # Check if attendance already exists for this employee on this date
+        existing_attendance = db.query(Attendance).filter(
+            Attendance.employee_id == attendance.employee_id,
+            Attendance.date == attendance.date
+        ).first()
         
-        return AttendanceResponse(
-            id=db_attendance.id,
-            employee_id=db_attendance.employee_id,
-            date=db_attendance.date,
-            status=db_attendance.status,
-            created_at=db_attendance.created_at.isoformat()
-        )
+        if existing_attendance:
+            # Update existing record
+            existing_attendance.status = attendance.status
+            db.commit()
+            db.refresh(existing_attendance)
+            
+            return AttendanceResponse(
+                id=existing_attendance.id,
+                employee_id=existing_attendance.employee_id,
+                date=existing_attendance.date,
+                status=existing_attendance.status,
+                created_at=existing_attendance.created_at.isoformat()
+            )
+        else:
+            # Create new record
+            db_attendance = Attendance(**attendance.model_dump())
+            db.add(db_attendance)
+            db.commit()
+            db.refresh(db_attendance)
+            
+            return AttendanceResponse(
+                id=db_attendance.id,
+                employee_id=db_attendance.employee_id,
+                date=db_attendance.date,
+                status=db_attendance.status,
+                created_at=db_attendance.created_at.isoformat()
+            )
     except Exception as e:
         db.rollback()
         raise HTTPException(
