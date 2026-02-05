@@ -1,0 +1,4 @@
+# HRMS Lite
+.DS_Store
+*.log
+.env
