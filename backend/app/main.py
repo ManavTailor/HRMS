@@ -14,11 +14,11 @@ app = FastAPI(
 )
 
 
-origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,https://hrms-v1sq.vercel.app").split(",")
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[
+        "https://hrms-v1sq.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
