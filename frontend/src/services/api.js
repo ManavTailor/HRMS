@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://34.47.244.175:8000'
+const API_URL = 'https://fastsaver.live'
 
 const api = axios.create({
   baseURL: API_URL,
